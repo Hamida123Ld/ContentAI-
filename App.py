@@ -8,7 +8,7 @@ st.markdown("### اصنع إعلانات احترافية في ثوانٍ بقو
 # API Key من Secrets
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 st.markdown("---")
 
