@@ -2,88 +2,96 @@ import streamlit as st
 import google.generativeai as genai
 
 st.set_page_config(page_title="ContentAI", layout="wide")
-st.title("✨ ContentAI - مولد الإعلانات الذكي")
-st.markdown("### اصنع إعلانات احترافية في ثوانٍ بقوة الذكاء الاصطناعي!")
 
-# API Key من Secrets
+st.title("ContentAI")
+st.markdown("### Generate Professional Ads in Seconds with AI Power!")
+st.markdown("---")
+
+# API Key
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.0-flash")
 
-st.markdown("---")
-
-# مدخلات المستخدم
+# Inputs
 col1, col2 = st.columns(2)
 
 with col1:
-    product_name = st.text_input("🏷️ اسم المنتج أو الخدمة", placeholder="مثال: عطر ورد الجوري")
-    product_type = st.selectbox("📦 نوع المنتج", [
-        "منتج عطور",
-        "ملابس وأزياء",
-        "مطعم وكافيه",
-        "متجر إلكتروني",
-        "خدمة تقنية",
-        "عقارات",
-        "سيارات",
-        "صحة وجمال",
-        "تعليم ودورات",
-        "أخرى"
+    product_name = st.text_input("Product / Service Name")
+    product_type = st.selectbox("Product Type", [
+        "Perfume & Beauty",
+        "Fashion & Clothing",
+        "Restaurant & Cafe",
+        "E-commerce Store",
+        "Tech Service",
+        "Real Estate",
+        "Cars",
+        "Health & Wellness",
+        "Education & Courses",
+        "Other"
+    ])
+    language = st.selectbox("Ad Language", [
+        "Arabic",
+        "English",
+        "French",
+        "Arabic + English"
     ])
 
 with col2:
-    target_audience = st.text_input("🎯 الجمهور المستهدف", placeholder="مثال: نساء 20-35 سنة")
-    tone = st.selectbox("🎨 أسلوب الإعلان", [
-        "احترافي وجذاب",
-        "عاطفي ومؤثر",
-        "مرح وخفيف",
-        "فخم وراقي",
-        "بسيط ومباشر"
+    target_audience = st.text_input("Target Audience")
+    tone = st.selectbox("Ad Style", [
+        "Professional & Attractive",
+        "Emotional & Impactful",
+        "Fun & Light",
+        "Luxury & Premium",
+        "Simple & Direct"
+    ])
+    platform = st.selectbox("Platform", [
+        "Instagram",
+        "Facebook",
+        "TikTok",
+        "Twitter/X",
+        "LinkedIn",
+        "WhatsApp"
     ])
 
-extra_info = st.text_area("💡 معلومات إضافية (اختياري)", placeholder="مثال: سعر خاص، عرض محدود، مميزات...")
-
-platform = st.selectbox("📱 منصة النشر", [
-    "إنستغرام",
-    "فيسبوك",
-    "تيك توك",
-    "تويتر/X",
-    "واتساب"
-])
+extra_info = st.text_area("Additional Info (Optional)")
 
 st.markdown("---")
 
-if st.button("🚀 اصنع الإعلان الآن!", use_container_width=True):
+if st.button("Generate Ad Now!", use_container_width=True):
     if not product_name:
-        st.error("⚠️ من فضلك أدخلي اسم المنتج!")
+        st.error("Please enter a product name!")
     else:
-        with st.spinner("⏳ جاري إنشاء إعلانك..."):
+        with st.spinner("Creating your ad..."):
             prompt = f"""
-أنت خبير تسويق عربي محترف. اكتب إعلاناً تسويقياً احترافياً باللغة العربية.
+You are a professional marketing expert. Create a professional advertisement.
 
-المعلومات:
-- المنتج/الخدمة: {product_name}
-- النوع: {product_type}
-- الجمهور المستهدف: {target_audience}
-- الأسلوب المطلوب: {tone}
-- منصة النشر: {platform}
-- معلومات إضافية: {extra_info if extra_info else "لا يوجد"}
+Details:
+- Product/Service: {product_name}
+- Type: {product_type}
+- Target Audience: {target_audience}
+- Style: {tone}
+- Platform: {platform}
+- Language: {language}
+- Additional Info: {extra_info if extra_info else "None"}
 
-اكتب 3 نسخ مختلفة من الإعلان، كل نسخة مناسبة لـ {platform}.
-استخدم إيموجي مناسبة، وهاشتاقات إذا كانت المنصة تستدعي ذلك.
-اجعل الإعلان جذاباً ومقنعاً ويدفع للتفاعل.
+Write 3 different versions of the ad in {language}.
+Use appropriate emojis and hashtags if needed for {platform}.
+Make each ad engaging, persuasive and action-driven.
 """
             response = model.generate_content(prompt)
-            
-            st.success("✅ تم إنشاء إعلانك!")
-            st.markdown("### 📢 إعلاناتك الجاهزة:")
+
+            st.success("Your ads are ready!")
+            st.markdown("### Your Generated Ads:")
             st.markdown(response.text)
-            
+
             st.download_button(
-                label="📥 تحميل الإعلانات",
+                label="Download Ads",
                 data=response.text,
                 file_name="contentai_ads.txt",
                 mime="text/plain"
             )
 
 st.markdown("---")
-st.markdown("*Powered by ContentAI × Gemini AI*")
+st.markdown("*Powered by ContentAI x Gemini AI*")
+
