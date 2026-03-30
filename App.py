@@ -7,10 +7,21 @@ st.title("ContentAI")
 st.markdown("### Generate Professional Ads in Seconds with AI Power!")
 st.markdown("---")
 
-# API Key
-api_key = st.secrets["GEMINI_API_KEY"]
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-1.5-flash-8b")
+# API Key من المستخدم
+st.sidebar.title("Settings")
+st.sidebar.markdown("### Get your free API Key:")
+st.sidebar.markdown("1. Go to [aistudio.google.com](https://aistudio.google.com)")
+st.sidebar.markdown("2. Click 'Get API Key'")
+st.sidebar.markdown("3. Paste it below")
+st.sidebar.markdown("---")
+user_api_key = st.sidebar.text_input("Your Gemini API Key", type="password")
+
+if not user_api_key:
+    st.warning("Please enter your Gemini API Key in the sidebar to start!")
+    st.stop()
+
+genai.configure(api_key=user_api_key)
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 # Inputs
 col1, col2 = st.columns(2)
@@ -63,7 +74,8 @@ if st.button("Generate Ad Now!", use_container_width=True):
         st.error("Please enter a product name!")
     else:
         with st.spinner("Creating your ad..."):
-            prompt = f"""
+            try:
+                prompt = f"""
 You are a professional marketing expert. Create a professional advertisement.
 
 Details:
@@ -79,19 +91,20 @@ Write 3 different versions of the ad in {language}.
 Use appropriate emojis and hashtags if needed for {platform}.
 Make each ad engaging, persuasive and action-driven.
 """
-            response = model.generate_content(prompt)
-
-            st.success("Your ads are ready!")
-            st.markdown("### Your Generated Ads:")
-            st.markdown(response.text)
-
-            st.download_button(
-                label="Download Ads",
-                data=response.text,
-                file_name="contentai_ads.txt",
-                mime="text/plain"
-            )
+                response = model.generate_content(prompt)
+                st.success("Your ads are ready!")
+                st.markdown("### Your Generated Ads:")
+                st.markdown(response.text)
+                st.download_button(
+                    label="Download Ads",
+                    data=response.text,
+                    file_name="contentai_ads.txt",
+                    mime="text/plain"
+                )
+            except Exception as e:
+                st.error("Invalid API Key or quota exceeded. Please check your key and try again.")
 
 st.markdown("---")
 st.markdown("*Powered by ContentAI x Gemini AI*")
+
 
