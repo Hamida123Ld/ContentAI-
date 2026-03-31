@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from groq import Groq
 
 st.set_page_config(page_title="ContentAI", layout="wide")
 
@@ -10,18 +10,17 @@ st.markdown("---")
 # API Key من المستخدم
 st.sidebar.title("Settings")
 st.sidebar.markdown("### Get your free API Key:")
-st.sidebar.markdown("1. Go to [aistudio.google.com](https://aistudio.google.com)")
-st.sidebar.markdown("2. Click 'Get API Key'")
+st.sidebar.markdown("1. Go to [console.groq.com](https://console.groq.com)")
+st.sidebar.markdown("2. Click 'Create API Key'")
 st.sidebar.markdown("3. Paste it below")
 st.sidebar.markdown("---")
-user_api_key = st.sidebar.text_input("Your Gemini API Key", type="password")
+user_api_key = st.sidebar.text_input("Your Groq API Key", type="password")
 
 if not user_api_key:
-    st.warning("Please enter your Gemini API Key in the sidebar to start!")
+    st.warning("Please enter your Groq API Key in the sidebar to start!")
     st.stop()
 
-genai.configure(api_key=user_api_key)
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = Groq(api_key=user_api_key)
 
 # Inputs
 col1, col2 = st.columns(2)
@@ -91,20 +90,26 @@ Write 3 different versions of the ad in {language}.
 Use appropriate emojis and hashtags if needed for {platform}.
 Make each ad engaging, persuasive and action-driven.
 """
-                response = model.generate_content(prompt)
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=1500
+                )
+                result = response.choices[0].message.content
                 st.success("Your ads are ready!")
                 st.markdown("### Your Generated Ads:")
-                st.markdown(response.text)
+                st.markdown(result)
                 st.download_button(
                     label="Download Ads",
-                    data=response.text,
+                    data=result,
                     file_name="contentai_ads.txt",
                     mime="text/plain"
                 )
             except Exception as e:
-                st.error("Invalid API Key or quota exceeded. Please check your key and try again.")
+                st.error("Invalid API Key. Please check your Groq API key and try again.")
 
 st.markdown("---")
-st.markdown("*Powered by ContentAI x Gemini AI*")
+st.markdown("*Powered by ContentAI x Groq AI*")
+
 
 
